@@ -4,6 +4,17 @@ import models, constants
 
 
 def get_substitutions(worksheet: openpyxl.worksheet.worksheet.Worksheet) -> typing.Generator[models.SubstitutionModel]:
+    def _get_period(*args, number: int) -> models.PeriodModel:
+        return models.PeriodModel(
+            data={
+                "lecturer": args[2],
+                "number": number,
+                "room": args[3],
+                "subgroup": int(args[0]) if args[0] else 0,
+                "subject": args[1],
+            },
+        )
+
     for row in list(worksheet.rows)[constants.TABLE_HEADER_INDEX:]:
         row = list(
             map(
@@ -15,40 +26,19 @@ def get_substitutions(worksheet: openpyxl.worksheet.worksheet.Worksheet) -> typi
         if set(row) == {None}:
             continue
 
-        row_values = dict(
-            zip(
-                [
-                    "group",
-                    "number",
-                    "period_subgroup",
-                    "period_subject",
-                    "period_lecturer",
-                    "period_room",
-                    "substitution_subgroup",
-                    "substitution_subject",
-                    "substitution_lecturer",
-                    "substitution_room",
-                ],
-                row,
-            )
-        )
+        group, period_number, *row_values = row
+        period_number = int(period_number)
 
         yield models.SubstitutionModel(
             data={
-                "group": row_values["group"],
-                "period": {
-                    "lecturer": row_values["period_lecturer"],
-                    "number": int(row_values["number"]),
-                    "room": row_values["period_room"],
-                    "subgroup": int(row_values["period_subgroup"]) if row_values["period_subgroup"] else 0,
-                    "subject": row_values["period_subject"],
-                },
-                "substitution": {
-                    "lecturer": row_values["substitution_lecturer"],
-                    "number": int(row_values["number"]),
-                    "room": row_values["substitution_room"],
-                    "subgroup": int(row_values["substitution_subgroup"]) if row_values["substitution_subgroup"] else 0,
-                    "subject": row_values["substitution_subject"],
-                },
+                "group": group,
+                "period": _get_period(
+                    *row_values[4:],
+                    number=period_number,
+                )._data,
+                "substitution": _get_period(
+                    *row_values[:4],
+                    number=period_number,
+                )._data,
             },
         )

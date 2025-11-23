@@ -3,12 +3,12 @@ import data
 
 
 def main():
-    filenames = [
+    workbooks = [
         "substitutions",
         "substitutions_old",
     ]
 
-    for filename in filenames:
+    for filename in workbooks:
         workbook = openpyxl.load_workbook(
             filename=pyquoks.utils.get_path(f"tables/{filename}.xlsx"),
         )
