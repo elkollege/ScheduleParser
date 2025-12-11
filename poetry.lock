@@ -681,14 +681,14 @@ typing-extensions = ">=4.14.1"
 
 [[package]]
 name = "pyquoks"
-version = "2.2.0"
+version = "2.2.1.1"
 description = "Пакет PyPI для часто используемых модулей в проектах diquoks"
 optional = false
 python-versions = ">=3.14"
 groups = ["main"]
 files = [
-    {file = "pyquoks-2.2.0-py3-none-any.whl", hash = "sha256:75e68845310d3ce0fc93e637bc12734e67876fba4a114f526db7d6bae33fb4b4"},
-    {file = "pyquoks-2.2.0.tar.gz", hash = "sha256:b82f74ab781f32a703011f85a9f44186f51fb6d32ea573a2924978cba7a42ce7"},
+    {file = "pyquoks-2.2.1.1-py3-none-any.whl", hash = "sha256:babb011c0acd87a15abb117f93a466424b62d61a8b4505d651e3579325f45f2e"},
+    {file = "pyquoks-2.2.1.1.tar.gz", hash = "sha256:501be1c9a85af123be798221617efa11b6b7832ba5c75a1576a369ca6b520ba0"},
 ]
 
 [package.dependencies]
@@ -710,7 +710,7 @@ pydantic-core = "2.41.5"
 requests = "2.32.5"
 typing-extensions = "4.15.0"
 typing-inspection = "0.4.2"
-urllib3 = "2.6.1"
+urllib3 = "2.6.2"
 waitress = "3.0.2"
 werkzeug = "3.1.4"
 
@@ -765,14 +765,14 @@ typing-extensions = ">=4.12.0"
 
 [[package]]
 name = "urllib3"
-version = "2.6.1"
+version = "2.6.2"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "urllib3-2.6.1-py3-none-any.whl", hash = "sha256:e67d06fe947c36a7ca39f4994b08d73922d40e6cca949907be05efa6fd75110b"},
-    {file = "urllib3-2.6.1.tar.gz", hash = "sha256:5379eb6e1aba4088bae84f8242960017ec8d8e3decf30480b3a1abdaa9671a3f"},
+    {file = "urllib3-2.6.2-py3-none-any.whl", hash = "sha256:ec21cddfe7724fc7cb4ba4bea7aa8e2ef36f607a4bab81aa6ce42a13dc3f03dd"},
+    {file = "urllib3-2.6.2.tar.gz", hash = "sha256:016f9c98bb7e98085cb2b4b17b87d2c702975664e4f060c6532e64d1c1a5e797"},
 ]
 
 [package.extras]
@@ -818,4 +818,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.14"
-content-hash = "e66c83ed7b7cf42917fc537d56c7b9339b29faf35db8aecf8e3d343cc0ead89f"
+content-hash = "b2d36f1cda9ea21c815298f06d013a64a723f353fe9247c40ea27d851b20b839"
