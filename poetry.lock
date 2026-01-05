@@ -26,14 +26,14 @@ files = [
 
 [[package]]
 name = "certifi"
-version = "2025.11.12"
+version = "2026.1.4"
 description = "Python package for providing Mozilla's CA Bundle."
 optional = false
 python-versions = ">=3.7"
 groups = ["main"]
 files = [
-    {file = "certifi-2025.11.12-py3-none-any.whl", hash = "sha256:97de8790030bbd5c2d96b7ec782fc2f7820ef8dba6db909ccf95449f2d062d4b"},
-    {file = "certifi-2025.11.12.tar.gz", hash = "sha256:d8ab5478f2ecd78af242878415affce761ca6bc54a22a27e026d7c25357c3316"},
+    {file = "certifi-2026.1.4-py3-none-any.whl", hash = "sha256:9943707519e4add1115f44c2bc244f782c0249876bf51b6599fee1ffbedd685c"},
+    {file = "certifi-2026.1.4.tar.gz", hash = "sha256:ac726dd470482006e014ad384921ed6438c457018f4b3d204aea4281258b2120"},
 ]
 
 [[package]]
@@ -683,20 +683,20 @@ typing-extensions = ">=4.14.1"
 
 [[package]]
 name = "pyquoks"
-version = "2.3.1"
+version = "2.3.2"
 description = "Пакет PyPI для часто используемых модулей в проектах diquoks"
 optional = false
 python-versions = ">=3.14"
 groups = ["main"]
 files = [
-    {file = "pyquoks-2.3.1-py3-none-any.whl", hash = "sha256:6fb36be61646586f6252a28f250e7678edb61589f540022491a47bec45225f70"},
-    {file = "pyquoks-2.3.1.tar.gz", hash = "sha256:2f293f9baf5ed930ec78911f62b822c31f431f4235cefc204d331596d8320dcb"},
+    {file = "pyquoks-2.3.2-py3-none-any.whl", hash = "sha256:3e7854bd278b05224110816190e0605f80c6bde8ead2e4d4e0a09cf2124c2234"},
+    {file = "pyquoks-2.3.2.tar.gz", hash = "sha256:b36fdb75c583c51ee0d85b8a8dff0d5af81876ec854bcb21f7ba5012fce1a8e8"},
 ]
 
 [package.dependencies]
 annotated-types = "0.7.0"
 blinker = "1.9.0"
-certifi = "2025.11.12"
+certifi = "2026.1.4"
 charset-normalizer = "3.4.4"
 click = "8.3.1"
 colorama = "0.4.6"
@@ -820,4 +820,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.14"
-content-hash = "33864069ec13e559a95404e4b016b5f61d10df823352aa99c2fa3c489301a2b2"
+content-hash = "3b8a0b84bdd261715b3bd69fbc30341feb08a6aefccd8cbe06c9ec2c50dc5a59"
