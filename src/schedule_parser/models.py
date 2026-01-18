@@ -148,14 +148,4 @@ class Substitution(pydantic.BaseModel):
     def subgroup(self) -> int:
         return self.substitution.subgroup
 
-
-class BellsVariant(pydantic.BaseModel):
-    bells: list[str]
-
-    def format_period(self, period: Period) -> str:
-        return " | ".join([
-            self.bells[period.number],
-            period.readable,
-        ])
-
 # endregion
