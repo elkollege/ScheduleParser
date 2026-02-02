@@ -5,8 +5,8 @@ import typing
 import openpyxl.cell.cell
 import openpyxl.worksheet.worksheet
 
-from . import constants
-from . import models
+import schedule_parser.constants
+import schedule_parser.models
 
 
 def _ensure_str(var: typing.Any) -> str:
@@ -19,43 +19,43 @@ def _ensure_int(var: typing.Any) -> int:
 
 def parse_schedule(
         worksheet: openpyxl.worksheet.worksheet.Worksheet,
-) -> typing.Generator[models.GroupSchedule]:
+) -> typing.Generator[schedule_parser.models.GroupSchedule]:
     def _get_periods(
             columns: list[list[openpyxl.cell.cell.Cell]],
-    ) -> typing.Generator[models.Period]:
+    ) -> typing.Generator[schedule_parser.models.Period]:
         def _get_number(row: int) -> typing.Any:
             return int(
                 worksheet.cell(
                     row=row,
-                    column=constants.SCHEDULE_DATA_NUMBER_COLUMN,
+                    column=schedule_parser.constants.SCHEDULE_DATA_NUMBER_COLUMN,
                 ).value
             )
 
         def _get_subgroup(column: int) -> typing.Any:
             return worksheet.cell(
-                row=constants.SCHEDULE_DATA_SUBGROUP_ROW,
+                row=schedule_parser.constants.SCHEDULE_DATA_SUBGROUP_ROW,
                 column=column,
             ).value
 
         split_columns = [
             [
-                list(batched) for batched in itertools.batched(column, constants.SCHEDULE_PERIOD_HEIGHT)
+                list(batched) for batched in itertools.batched(column, schedule_parser.constants.SCHEDULE_PERIOD_HEIGHT)
             ] for column in columns
         ]
 
         for period_values in [list(current_columns) for current_columns in zip(*split_columns)]:
             if isinstance(period_values[1][0], openpyxl.cell.cell.MergedCell):
-                yield models.Period(
+                yield schedule_parser.models.Period(
                     lecturer=_ensure_str(period_values[0][1].value),
                     number=_ensure_int(_get_number(period_values[0][0].row)),
                     room=_ensure_str(period_values[3][0].value),
-                    subgroup=constants.SCHEDULE_DATA_NO_SUBGROUP,
+                    subgroup=schedule_parser.constants.SCHEDULE_DATA_NO_SUBGROUP,
                     subject=_ensure_str(period_values[0][0].value),
                 )
             else:
                 for first_column, second_column in [(0, 1), (2, 3)]:
                     if period_values[first_column][0].value:
-                        yield models.Period(
+                        yield schedule_parser.models.Period(
                             lecturer=_ensure_str(period_values[first_column][1].value),
                             number=_ensure_int(_get_number(period_values[first_column][0].row)),
                             room=_ensure_str(period_values[second_column][0].value),
@@ -65,12 +65,12 @@ def parse_schedule(
 
     def _get_day_schedule(
             columns: list[list[openpyxl.cell.cell.Cell]],
-    ) -> typing.Generator[models.DaySchedule]:
-        def _get_weekday(row: int) -> models.Weekday:
-            return models.Weekday.from_string(
+    ) -> typing.Generator[schedule_parser.models.DaySchedule]:
+        def _get_weekday(row: int) -> schedule_parser.models.Weekday:
+            return schedule_parser.models.Weekday.from_string(
                 string=worksheet.cell(
                     row=row,
-                    column=constants.SCHEDULE_DATA_WEEKDAY_COLUMN,
+                    column=schedule_parser.constants.SCHEDULE_DATA_WEEKDAY_COLUMN,
                 ).value,
             )
 
@@ -82,23 +82,23 @@ def parse_schedule(
 
             for cell in column:
                 current_column.append(cell)
-                if cell.border.bottom.style == constants.SCHEDULE_DATA_WEEKDAY_BORDER:
+                if cell.border.bottom.style == schedule_parser.constants.SCHEDULE_DATA_WEEKDAY_BORDER:
                     current_columns.append(current_column.copy())
                     current_column.clear()
 
             split_columns.append(current_columns)
 
         for day_schedule in [list(current_columns) for current_columns in zip(*split_columns)]:
-            yield models.DaySchedule(
+            yield schedule_parser.models.DaySchedule(
                 weekday=_get_weekday(day_schedule[0][0].row).value,
                 schedule=list(_get_periods(day_schedule)),
             )
 
     def _get_week_schedule(
             columns: list[tuple[openpyxl.cell.cell.Cell, ...]],
-    ) -> typing.Generator[models.WeekSchedule]:
+    ) -> typing.Generator[schedule_parser.models.WeekSchedule]:
         def _check_cell_color(cell_index: int) -> bool:
-            return columns[0][cell_index].fill.fgColor.rgb == constants.SCHEDULE_DATA_ODD_COLOR
+            return columns[0][cell_index].fill.fgColor.rgb == schedule_parser.constants.SCHEDULE_DATA_ODD_COLOR
 
         week_variants = [
             (
@@ -108,30 +108,30 @@ def parse_schedule(
         ]
 
         for week_variant in week_variants:
-            yield models.WeekSchedule(
+            yield schedule_parser.models.WeekSchedule(
                 parity=week_variant[1],
                 schedule=list(_get_day_schedule(week_variant[0])),
             )
 
     def _get_group(column: int) -> typing.Any:
         return worksheet.cell(
-            row=constants.SCHEDULE_DATA_GROUP_ROW,
+            row=schedule_parser.constants.SCHEDULE_DATA_GROUP_ROW,
             column=column,
         ).value
 
     for group_columns in itertools.batched(
             list(worksheet.columns)[
-                constants.SCHEDULE_SIDEBAR_WIDTH:constants.SCHEDULE_JUNK_OFFSET
+                schedule_parser.constants.SCHEDULE_SIDEBAR_WIDTH:schedule_parser.constants.SCHEDULE_JUNK_OFFSET
             ],
-            constants.SCHEDULE_GROUP_WIDTH,
+            schedule_parser.constants.SCHEDULE_GROUP_WIDTH,
     ):
         group_columns = [
             column[
-                constants.SCHEDULE_HEADER_INDEX:constants.SCHEDULE_FOOTER_OFFSET
-            ] for column in group_columns[-constants.SCHEDULE_JUNK_OFFSET:]
+                schedule_parser.constants.SCHEDULE_HEADER_INDEX:schedule_parser.constants.SCHEDULE_FOOTER_OFFSET
+            ] for column in group_columns[-schedule_parser.constants.SCHEDULE_JUNK_OFFSET:]
         ]
 
-        yield models.GroupSchedule(
+        yield schedule_parser.models.GroupSchedule(
             group=_ensure_str(_get_group(group_columns[0][0].column)),
             schedule=list(_get_week_schedule(group_columns)),
         )
@@ -139,9 +139,9 @@ def parse_schedule(
 
 def parse_substitutions(
         worksheet: openpyxl.worksheet.worksheet.Worksheet,
-) -> typing.Generator[models.Substitution]:
-    def _get_period(*args, number: int) -> models.Period:
-        return models.Period(
+) -> typing.Generator[schedule_parser.models.Substitution]:
+    def _get_period(*args, number: int) -> schedule_parser.models.Period:
+        return schedule_parser.models.Period(
             lecturer=_ensure_str(args[2]),
             number=number,
             room=_ensure_str(args[3]),
@@ -149,8 +149,8 @@ def parse_substitutions(
             subject=_ensure_str(args[1]),
         )
 
-    for row in list(worksheet.rows)[constants.SUBSTITUTIONS_HEADER_INDEX:]:
-        row_values = [cell.value for cell in row[:constants.SUBSTITUTIONS_WIDTH]]
+    for row in list(worksheet.rows)[schedule_parser.constants.SUBSTITUTIONS_HEADER_INDEX:]:
+        row_values = [cell.value for cell in row[:schedule_parser.constants.SUBSTITUTIONS_WIDTH]]
 
         if set(row_values) == {
             None,
@@ -160,7 +160,7 @@ def parse_substitutions(
         group, period_number, *row_values = row_values
         period_number = int(period_number)
 
-        yield models.Substitution(
+        yield schedule_parser.models.Substitution(
             group=group,
             period=_get_period(
                 *row_values[:4],
@@ -203,13 +203,13 @@ def get_week_number(date: datetime.datetime) -> int:
 
 
 def get_schedule_with_substitutions(
-        schedule: list[models.GroupSchedule],
-        substitutions: list[models.Substitution],
+        schedule: list[schedule_parser.models.GroupSchedule],
+        substitutions: list[schedule_parser.models.Substitution],
         group: str,
         date: datetime.datetime,
-) -> list[models.Period]:
-    def sort_and_filter_same_but_subgroup(periods: list[models.Period]) -> list[
-        models.Period]:
+) -> list[schedule_parser.models.Period]:
+    def sort_and_filter_same_but_subgroup(periods: list[schedule_parser.models.Period]) -> list[
+        schedule_parser.models.Period]:
         filtered_periods = []
 
         for first_period in periods:
@@ -229,13 +229,13 @@ def get_schedule_with_substitutions(
         return filtered_periods[::2]
 
     schedule = (
-        models.GroupSchedule.get_group_schedule_by_group(schedule, group)
+        schedule_parser.models.GroupSchedule.get_group_schedule_by_group(schedule, group)
         .get_week_schedule_by_parity(get_week_number(date) % 2 == 0)
-        .get_day_schedule_by_weekday(models.Weekday(date.weekday()))
+        .get_day_schedule_by_weekday(schedule_parser.models.Weekday(date.weekday()))
         .schedule
     )
 
-    substitutions = models.Substitution.get_substitutions_by_group(substitutions, group)
+    substitutions = schedule_parser.models.Substitution.get_substitutions_by_group(substitutions, group)
 
     new_schedule = schedule.copy()
 

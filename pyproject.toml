@@ -1,19 +1,27 @@
 [project]
 name = "schedule_parser"
 version = "1.0.0"
-description = "Ты думал тут что-то будет?"
+description = "Библиотека для взаимодействий с заменами и расписанием ЭК"
 authors = [
     { name = "Denis Titovets <den232titovets@yandex.ru>" }
 ]
 license = { text = "MIT" }
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.14,<4.0"
 dependencies = [
     "openpyxl (>=3.1.5)",
     "pydantic (>=2.12.5)",
-    "pyquoks (>=2.4.0,<2.5.0)"
+    "pyquoks (>=2.5.0,<2.6.0)"
 ]
 
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.2)",
+    "poetry (>=2.3.2)"
+]
+
+[tool.pytest]
+pythonpath = ["src"]
 
 [build-system]
 requires = ["poetry-core (>=2.0.0, <3.0.0)"]

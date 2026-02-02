@@ -4,16 +4,12 @@ import textwrap
 import openpyxl
 import pyquoks
 
-import src.schedule_parser
+import schedule_parser
 
 
-class TestUtils(pyquoks.test.TestCase):
-    _MODULE_NAME = __name__
-
+class TestUtils:
     @classmethod
-    def setUpClass(cls) -> None:
-        super().setUpClass()
-
+    def setup_class(cls) -> None:
         cls._SUBSTITUTIONS_NAMES = [
             "substitutions",
             "substitutions_old",
@@ -73,51 +69,44 @@ class TestUtils(pyquoks.test.TestCase):
 
     def test_parse_schedule(self):
         workbook = openpyxl.load_workbook(
-            filename=pyquoks.utils.get_path("tests/resources/tables/schedule.xlsx"),
+            filename=pyquoks.utils.get_path("resources/tables/schedule.xlsx"),
         )
 
-        for group in list(src.schedule_parser.utils.parse_schedule(workbook.worksheets[0])):
-            self.assert_type(
-                func_name=self.test_parse_schedule.__name__,
-                test_data=group,
-                test_type=src.schedule_parser.models.GroupSchedule,
-                message="objects in parsed schedules list",
-            )
+        for group in list(schedule_parser.utils.parse_schedule(workbook.worksheets[0])):
+            assert isinstance(group, schedule_parser.models.GroupSchedule), "objects in parsed schedules list"
 
     def test_parse_substitutions(self):
         for substitution_name in self._SUBSTITUTIONS_NAMES:
             workbook = openpyxl.load_workbook(
-                filename=pyquoks.utils.get_path(f"tests/resources/tables/{substitution_name}.xlsx"),
+                filename=pyquoks.utils.get_path(f"resources/tables/{substitution_name}.xlsx"),
             )
 
-            for substitution in list(src.schedule_parser.utils.parse_substitutions(workbook.worksheets[0])):
-                self.assert_type(
-                    func_name=self.test_parse_substitutions.__name__,
-                    test_data=substitution,
-                    test_type=src.schedule_parser.models.Substitution,
-                    message=f"({substitution_name}) objects in parsed substitutions list",
-                )
+            for substitution in list(schedule_parser.utils.parse_substitutions(workbook.worksheets[0])):
+                assert isinstance(
+                    substitution,
+                    schedule_parser.models.Substitution,
+                ), f"({substitution_name}) objects in parsed substitutions list"
 
     def test_schedule_with_substitutions(self):
         workbook_schedule = openpyxl.load_workbook(
-            filename=pyquoks.utils.get_path("tests/resources/tables/schedule.xlsx"),
+            filename=pyquoks.utils.get_path("resources/tables/schedule.xlsx"),
         )
 
         for name, correct_schedule in self._SCHEDULE_WITH_SUBSTITUTIONS.items():
             workbook_substitutions = openpyxl.load_workbook(
-                filename=pyquoks.utils.get_path(f"tests/resources/tables/substitutions_{name}.xlsx"),
+                filename=pyquoks.utils.get_path(f"resources/tables/substitutions_{name}.xlsx"),
             )
 
             current_date = datetime.datetime.strptime(name, "%d_%m_%y")
 
-            current_schedule = src.schedule_parser.utils.get_schedule_with_substitutions(
+            current_schedule = schedule_parser.utils.get_schedule_with_substitutions(
                 schedule=list(
-                    src.schedule_parser.utils.parse_schedule(
+                    schedule_parser.utils.parse_schedule(
                         worksheet=workbook_schedule.worksheets[0],
                     )
                 ),
                 substitutions=list(
-                    src.schedule_parser.utils.parse_substitutions(
+                    schedule_parser.utils.parse_substitutions(
                         worksheet=workbook_substitutions.worksheets[0],
                     )
                 ),
@@ -125,9 +114,6 @@ class TestUtils(pyquoks.test.TestCase):
                 date=current_date,
             )
 
-            self.assert_equal(
-                func_name=self.test_schedule_with_substitutions.__name__,
-                test_data="".join(f"{period.readable}\n" for period in current_schedule),
-                test_expected=correct_schedule,
-                message=f"({name}) compare parsed schedule with correct one",
-            )
+            assert "".join(
+                f"{period.readable}\n" for period in current_schedule
+            ) == correct_schedule, f"({name}) compare parsed schedule with correct one"
