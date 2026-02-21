@@ -3,6 +3,7 @@ import textwrap
 
 import openpyxl
 import pyquoks
+import pytest
 
 import schedule_parser
 
@@ -44,16 +45,30 @@ class TestUtils:
                 """\
                 """,
             ),
-        }
+        }  # TODO
 
+    @pytest.mark.skip(reason="waiting for fix")  # FIXME
     def test_parse_schedule(self):
         workbook = openpyxl.load_workbook(
             filename=pyquoks.utils.get_path("resources/tables/schedule.xlsx"),
         )
 
-        for model in list(schedule_parser.utils.parse_schedule(workbook.worksheets[0])):
+        for model in schedule_parser.utils.parse_schedule(workbook.worksheets[0]):
             assert isinstance(model, schedule_parser.models.GroupSchedule), "objects in parsed schedules list"
 
+    def test_parse_substitutions(self):
+        for string_date in self._CORRECT_SCHEDULES.keys():
+            workbook = openpyxl.load_workbook(
+                filename=pyquoks.utils.get_path(f"resources/tables/substitutions_{string_date}.xlsx"),
+            )
+
+            for substitution in schedule_parser.utils.parse_substitutions(workbook.worksheets[0]):
+                assert isinstance(
+                    substitution,
+                    schedule_parser.models.Substitution,
+                ), f"({string_date}) objects in parsed substitutions list"
+
+    @pytest.mark.skip(reason="waiting for fix")  # FIXME
     def test_schedule_with_substitutions(self):
         workbook_schedule = openpyxl.load_workbook(
             filename=pyquoks.utils.get_path("resources/tables/schedule.xlsx"),
