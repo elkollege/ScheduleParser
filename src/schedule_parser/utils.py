@@ -17,10 +17,10 @@ def apply_substitutions_to_schedule(
     ...  # TODO
 
 
-def get_week_number(date: datetime.datetime) -> int:
-    current_week_number = date.isocalendar().week
+def get_academic_week_number(date: datetime.datetime) -> int:
+    current_week_number = date.isocalendar().week + 1
 
-    first_school_week_number = datetime.datetime(
+    first_academic_week_number = datetime.datetime(
         year=date.year - 1 if current_week_number < datetime.datetime(
             year=date.year - 1,
             month=9,
@@ -40,10 +40,9 @@ def get_week_number(date: datetime.datetime) -> int:
         day=28,
     ).isocalendar().week
 
-    if first_school_week_number <= current_week_number:
-        return current_week_number - first_school_week_number + 1
-    else:
-        return last_year_week_number - first_school_week_number + current_week_number + 1
+    return current_week_number - first_academic_week_number + (
+        last_year_week_number if current_week_number < first_academic_week_number else 0
+    )
 
 
 # endregion
