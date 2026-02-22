@@ -98,17 +98,9 @@ class DaySchedule(pydantic.BaseModel):
     periods_list: list[Period]
 
 
-class WeekSchedule(pydantic.BaseModel):
-    parity: bool
-    day_schedules_list: list[DaySchedule]
-
-    def get_day_schedule_by_weekday(self, weekday: int) -> DaySchedule | None:
-        return next(model for model in self.day_schedules_list if model.weekday == weekday)
-
-
 class GroupSchedule(pydantic.BaseModel):
     group_name: str
-    week_schedules_list: list[WeekSchedule]
+    day_schedules_list: list[DaySchedule]
 
     @classmethod
     def get_group_schedule_by_group_name(
@@ -118,8 +110,32 @@ class GroupSchedule(pydantic.BaseModel):
     ) -> GroupSchedule:
         return next(model for model in iterable if model.group_name == group_name)
 
-    def get_week_schedule_by_parity(self, parity: bool) -> WeekSchedule | None:
-        return next(model for model in self.week_schedules_list if model.parity == parity)
+    def get_day_schedule_by_weekday(self, weekday: int) -> DaySchedule | None:
+        return next(model for model in self.day_schedules_list if model.weekday == weekday)
+
+
+# class WeekSchedule(pydantic.BaseModel):
+#     parity: bool
+#     day_schedules_list: list[DaySchedule]
+#
+#     def get_day_schedule_by_weekday(self, weekday: int) -> DaySchedule | None:
+#         return next(model for model in self.day_schedules_list if model.weekday == weekday)
+#
+#
+# class GroupSchedule(pydantic.BaseModel):
+#     group_name: str
+#     week_schedules_list: list[WeekSchedule]
+#
+#     @classmethod
+#     def get_group_schedule_by_group_name(
+#             cls,
+#             iterable: list[GroupSchedule],
+#             group_name: str,
+#     ) -> GroupSchedule:
+#         return next(model for model in iterable if model.group_name == group_name)
+#
+#     def get_week_schedule_by_parity(self, parity: bool) -> WeekSchedule | None:
+#         return next(model for model in self.week_schedules_list if model.parity == parity)
 
 
 class Substitution(pydantic.BaseModel):

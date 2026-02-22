@@ -47,7 +47,6 @@ class TestUtils:
             ),
         }  # TODO
 
-    @pytest.mark.skip(reason="waiting for fix")  # FIXME
     def test_parse_schedule(self):
         workbook = openpyxl.load_workbook(
             filename=pyquoks.utils.get_path("resources/tables/schedule.xlsx"),
