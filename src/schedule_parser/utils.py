@@ -6,6 +6,7 @@ import more_itertools
 import openpyxl.cell.cell
 import openpyxl.worksheet.worksheet
 
+import schedule_parser.constants
 import schedule_parser.models
 
 
