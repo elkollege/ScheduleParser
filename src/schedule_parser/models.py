@@ -1,5 +1,4 @@
 import enum
-import typing
 
 import pydantic
 
@@ -41,104 +40,92 @@ class Weekday(enum.Enum):
 # region Models
 
 class Period(pydantic.BaseModel):
-    lecturer: str
     number: int
-    room: str
     subgroup: int
     subject: str
-
-    @property
-    def formatted_room(self) -> str:
-        if self.room.isdigit():
-            return f"{self.room} к."
-        else:
-            return self.room
+    lecturer: str
+    room: str
 
     @property
     def is_empty(self) -> bool:
-        return not bool(self.lecturer and self.room and self.subject)
+        return not bool(self.subject and self.lecturer and self.room)
 
     @property
     def readable(self) -> str:
-        if self.is_empty:
-            raise ValueError("Period is empty!")
-        else:
-            return " | ".join([
-                " ".join([
-                    i for i in [
-                        f"{self.number}.",
-                        f"({self.subgroup})" if self.subgroup else "",
-                        self.subject,
-                    ] if i
-                ]),
-                self.formatted_room,
-            ])
+        return " | ".join([
+            " ".join([
+                i for i in [
+                    f"{self.number}.",
+                    f"({self.subgroup})" if self.subgroup != 0 else None,
+                    self.subject,
+                ] if i
+            ]),
+            self.room,
+        ])
 
-    def is_same_period(self, period: typing.Self) -> bool:
+    def is_same_period(self, other: Period) -> bool:
         return (
             self.number,
             self.subgroup,
         ) == (
-            period.number,
-            period.subgroup,
+            other.number,
+            other.subgroup,
         )
 
-    def is_same_metadata(self, period: typing.Self) -> bool:
+    def is_same_metadata(self, other: Period) -> bool:
         return (
-            self.lecturer,
             self.number,
-            self.room,
             self.subject,
+            self.lecturer,
+            self.room,
         ) == (
-            period.lecturer,
-            period.number,
-            period.room,
-            period.subject,
+            other.number,
+            other.subject,
+            other.lecturer,
+            other.room,
         )
 
 
 class DaySchedule(pydantic.BaseModel):
-    schedule: list[Period]
     weekday: int
+    periods_list: list[Period]
 
 
-class WeekSchedule(pydantic.BaseModel):
-    parity: bool
-    schedule: list[DaySchedule]
-
-    def get_day_schedule_by_weekday(self, weekday: Weekday) -> DaySchedule | None:
-        try:
-            return [model for model in self.schedule if model.weekday == weekday.value][0]
-        except IndexError:
-            raise ValueError(f"Could not find schedule for weekday: {weekday!r}")
+# class WeekSchedule(pydantic.BaseModel):
+#     parity: bool
+#     day_schedules_list: list[DaySchedule]
+#
+#     def get_day_schedule_by_weekday(self, weekday: int) -> DaySchedule | None:
+#         return next(model for model in self.day_schedules_list if model.weekday == weekday)
 
 
 class GroupSchedule(pydantic.BaseModel):
-    group: str
-    schedule: list[WeekSchedule]
+    group_name: str
+    day_schedules_list: list[DaySchedule]
 
     @classmethod
-    def get_group_schedule_by_group(cls, iterable: typing.Iterable[typing.Self], group: str) -> typing.Self:
-        try:
-            return [model for model in iterable if model.group == group][0]
-        except IndexError:
-            raise ValueError(f"Could not find schedule for group: {group!r}")
+    def get_group_schedule_by_group_name(
+            cls,
+            iterable: list[GroupSchedule],
+            group_name: str,
+    ) -> GroupSchedule:
+        return next(model for model in iterable if model.group_name == group_name)
 
-    def get_week_schedule_by_parity(self, parity: bool) -> WeekSchedule | None:
-        try:
-            return [model for model in self.schedule if model.parity == parity][0]
-        except IndexError:
-            raise ValueError(f"Could not find schedule for parity: {parity!r}")
+    def get_day_schedule_by_weekday(self, weekday: int) -> DaySchedule | None:
+        return next(model for model in self.day_schedules_list if model.weekday == weekday)
+
+    # def get_week_schedule_by_parity(self, parity: bool) -> WeekSchedule | None:
+    #     return next(model for model in self.week_schedules_list if model.parity == parity)
 
 
 class Substitution(pydantic.BaseModel):
-    group: str
+    group_name: str
     period: Period
     substitution: Period
 
     @classmethod
-    def get_substitutions_by_group(cls, iterable: typing.Iterable[typing.Self], group: str) -> list[typing.Self]:
-        return [model for model in iterable if model.group == group]
+    def get_substitutions_by_group_name(cls, iterable: list[Substitution], group_name: str) -> list[Substitution]:
+        return [model for model in iterable if model.group_name == group_name]
 
     @property
     def number(self) -> int:
