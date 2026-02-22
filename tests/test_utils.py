@@ -3,7 +3,6 @@ import textwrap
 
 import openpyxl
 import pyquoks
-import pytest
 
 import schedule_parser
 
@@ -15,37 +14,75 @@ class TestUtils:
         cls._CORRECT_SCHEDULES = {
             "11_02_26": textwrap.dedent(
                 """\
+                1. Информ. (теор.) | 305
+                2. Физика | 110
+                3. Математика | 411
+                4. Русс.яз. | 213
+                5. Биология | 410
                 """,
             ),
             "12_02_26": textwrap.dedent(
                 """\
+                0. Классный час | 410
+                1. Химия | 102
+                2. Физ-ра | с.з.
+                3. Лит-ра | 213
+                4. История | 301
                 """,
             ),
             "13_02_26": textwrap.dedent(
                 """\
+                1. (1) Информ. (пр.) | 305
+                2. ОБиЗР | 201
+                3. Математика | 308
+                4. Инж. граф. | 210
+                5. История | 301
                 """,
             ),
             "16_02_26": textwrap.dedent(
                 """\
+                4. География | 401
+                5. Физика | 110
                 """,
             ),
             "17_02_26": textwrap.dedent(
                 """\
+                1. Лит-ра | 213
+                2. География | 401
+                3. Математика | 411
+                4. Химия | 103М
                 """,
             ),
             "18_02_26": textwrap.dedent(
                 """\
+                1. Математика | 308
+                2. Физика | 110
+                3. Математика | 308
+                4. Русс.яз. | 213
+                5. Биология | 410
                 """,
             ),
             "19_02_26": textwrap.dedent(
                 """\
+                0. Классный час | 410
+                1. Химия | 102
+                2. Физ-ра | с.з.
+                3. Биология | 410
+                4. История | 301
                 """,
             ),
             "20_02_26": textwrap.dedent(
                 """\
+                0. Разговоры о важном | 410
+                1. (1) Информ. (пр.) | 305
+                1. (2) Ин. язык | 309
+                2. ОБиЗР | 201
+                3. Физ-ра | спортзал
+                4. (1) Ин. язык | 309
+                4. (2) Информ. (пр.) | 305
                 """,
             ),
-        }  # TODO
+        }
 
     def test_parse_schedule(self):
         workbook = openpyxl.load_workbook(
@@ -67,7 +104,6 @@ class TestUtils:
                     schedule_parser.models.Substitution,
                 ), f"({string_date}) objects in parsed substitutions list"
 
-    @pytest.mark.skip(reason="waiting for fix")  # FIXME
     def test_schedule_with_substitutions(self):
         workbook_schedule = openpyxl.load_workbook(
             filename=pyquoks.utils.get_path("resources/tables/schedule.xlsx"),

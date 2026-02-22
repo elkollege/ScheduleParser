@@ -47,13 +47,6 @@ class Period(pydantic.BaseModel):
     room: str
 
     @property
-    def formatted_room(self) -> str:
-        if self.room.isdigit():
-            return f"{self.room} каб."
-        else:
-            return self.room
-
-    @property
     def is_empty(self) -> bool:
         return not bool(self.subject and self.lecturer and self.room)
 
@@ -67,7 +60,7 @@ class Period(pydantic.BaseModel):
                     self.subject,
                 ] if i
             ]),
-            self.formatted_room,
+            self.room,
         ])
 
     def is_same_period(self, other: Period) -> bool:
@@ -98,6 +91,14 @@ class DaySchedule(pydantic.BaseModel):
     periods_list: list[Period]
 
 
+# class WeekSchedule(pydantic.BaseModel):
+#     parity: bool
+#     day_schedules_list: list[DaySchedule]
+#
+#     def get_day_schedule_by_weekday(self, weekday: int) -> DaySchedule | None:
+#         return next(model for model in self.day_schedules_list if model.weekday == weekday)
+
+
 class GroupSchedule(pydantic.BaseModel):
     group_name: str
     day_schedules_list: list[DaySchedule]
@@ -113,29 +114,8 @@ class GroupSchedule(pydantic.BaseModel):
     def get_day_schedule_by_weekday(self, weekday: int) -> DaySchedule | None:
         return next(model for model in self.day_schedules_list if model.weekday == weekday)
 
-
-# class WeekSchedule(pydantic.BaseModel):
-#     parity: bool
-#     day_schedules_list: list[DaySchedule]
-#
-#     def get_day_schedule_by_weekday(self, weekday: int) -> DaySchedule | None:
-#         return next(model for model in self.day_schedules_list if model.weekday == weekday)
-#
-#
-# class GroupSchedule(pydantic.BaseModel):
-#     group_name: str
-#     week_schedules_list: list[WeekSchedule]
-#
-#     @classmethod
-#     def get_group_schedule_by_group_name(
-#             cls,
-#             iterable: list[GroupSchedule],
-#             group_name: str,
-#     ) -> GroupSchedule:
-#         return next(model for model in iterable if model.group_name == group_name)
-#
-#     def get_week_schedule_by_parity(self, parity: bool) -> WeekSchedule | None:
-#         return next(model for model in self.week_schedules_list if model.parity == parity)
+    # def get_week_schedule_by_parity(self, parity: bool) -> WeekSchedule | None:
+    #     return next(model for model in self.week_schedules_list if model.parity == parity)
 
 
 class Substitution(pydantic.BaseModel):
