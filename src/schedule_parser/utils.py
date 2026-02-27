@@ -13,49 +13,20 @@ from . import models
 # region Utils
 
 def apply_substitutions_to_schedule(
-        schedule: list[models.GroupSchedule],
+        schedule: list[models.Period],
         substitutions: list[models.Substitution],
-        group_name: str,
-        date: datetime.datetime,
 ) -> list[models.Period]:
-    def _filter_same_metadata(periods_list: list[models.Period]) -> list[models.Period]:
-        filtered_periods_list = []
-
-        for first_period in periods_list:
-            for second_period in periods_list:
-                if not first_period.is_same_period(second_period) and first_period.is_same_metadata(second_period):
-                    first_period.subgroup = 0
-                    filtered_periods_list.append(first_period)
-                    break
-            else:
-                filtered_periods_list.extend([first_period] * 2)
-
-        filtered_periods_list.sort(
-            key=lambda period: (period.number, period.subgroup),
-        )
-
-        return filtered_periods_list[::2]
-
-    schedule = (
-        models.GroupSchedule.get_group_schedule_by_group_name(schedule, group_name)
-        .get_day_schedule_by_weekday(date.weekday())
-        .periods_list
-    )
-
-    substitutions = models.Substitution.get_substitutions_by_group_name(substitutions, group_name)
-
-    new_schedule = schedule.copy()
-
     for substitution in substitutions:
-        for index, period_model in enumerate(new_schedule):
-            if period_model.is_same_period(substitution.period):
-                new_schedule[index] = substitution.substitution
-                break
-        else:
-            if not substitution.substitution.is_empty:
-                new_schedule.append(substitution.substitution)
+        try:
+            schedule.remove(substitution.period)
+        except ValueError:
+            pass
+        schedule.append(substitution.substitution)
 
-    return _filter_same_metadata([period for period in new_schedule if not period.is_empty])
+    return sorted(
+        [period for period in schedule if not period.is_empty],
+        key=lambda period: (period.number, period.subgroup),
+    )
 
 
 def get_academic_week_number(date: datetime.datetime) -> int:
