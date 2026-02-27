@@ -14,23 +14,23 @@ class Weekday(enum.Enum):
     SATURDAY = 5
     SUNDAY = 6
 
-    @staticmethod
-    def from_string(string: str) -> Weekday:
+    @classmethod
+    def from_string(cls, string: str) -> Weekday:
         match string.lower():
             case "понедельник":
-                return Weekday.MONDAY
+                return cls.MONDAY
             case "вторник":
-                return Weekday.TUESDAY
+                return cls.TUESDAY
             case "среда":
-                return Weekday.WEDNESDAY
+                return cls.WEDNESDAY
             case "четверг":
-                return Weekday.THURSDAY
+                return cls.THURSDAY
             case "пятница":
-                return Weekday.FRIDAY
+                return cls.FRIDAY
             case "суббота":
-                return Weekday.SATURDAY
+                return cls.SATURDAY
             case "воскресенье":
-                return Weekday.SUNDAY
+                return cls.SUNDAY
             case _:
                 raise ValueError(f"Unknown weekday: {string!r}")
 
@@ -63,59 +63,22 @@ class Period(pydantic.BaseModel):
             self.room,
         ])
 
-    def is_same_period(self, other: Period) -> bool:
-        return (
-            self.number,
-            self.subgroup,
-        ) == (
-            other.number,
-            other.subgroup,
-        )
-
-    def is_same_metadata(self, other: Period) -> bool:
-        return (
-            self.number,
-            self.subject,
-            self.lecturer,
-            self.room,
-        ) == (
-            other.number,
-            other.subject,
-            other.lecturer,
-            other.room,
-        )
-
 
 class DaySchedule(pydantic.BaseModel):
     weekday: int
     periods_list: list[Period]
 
 
-# class WeekSchedule(pydantic.BaseModel):
-#     parity: bool
-#     day_schedules_list: list[DaySchedule]
-#
-#     def get_day_schedule_by_weekday(self, weekday: int) -> DaySchedule | None:
-#         return next(model for model in self.day_schedules_list if model.weekday == weekday)
-
-
 class GroupSchedule(pydantic.BaseModel):
     group_name: str
     day_schedules_list: list[DaySchedule]
 
-    @classmethod
-    def get_group_schedule_by_group_name(
-            cls,
-            iterable: list[GroupSchedule],
-            group_name: str,
-    ) -> GroupSchedule:
-        return next(model for model in iterable if model.group_name == group_name)
-
     def get_day_schedule_by_weekday(self, weekday: int) -> DaySchedule | None:
         return next(model for model in self.day_schedules_list if model.weekday == weekday)
 
-    # def get_week_schedule_by_parity(self, parity: bool) -> WeekSchedule | None:
-    #     return next(model for model in self.week_schedules_list if model.parity == parity)
+    @staticmethod
+    def get_group_schedule_by_group_name(iterable: list[GroupSchedule], group_name: str) -> GroupSchedule:
+        return next(model for model in iterable if model.group_name == group_name)
 
 
 class Substitution(pydantic.BaseModel):
@@ -123,16 +86,8 @@ class Substitution(pydantic.BaseModel):
     period: Period
     substitution: Period
 
-    @classmethod
-    def get_substitutions_by_group_name(cls, iterable: list[Substitution], group_name: str) -> list[Substitution]:
+    @staticmethod
+    def get_substitutions_by_group_name(iterable: list[Substitution], group_name: str) -> list[Substitution]:
         return [model for model in iterable if model.group_name == group_name]
-
-    @property
-    def number(self) -> int:
-        return self.substitution.number
-
-    @property
-    def subgroup(self) -> int:
-        return self.substitution.subgroup
 
 # endregion
