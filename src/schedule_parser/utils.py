@@ -21,6 +21,7 @@ def apply_substitutions_to_schedule(
             schedule.remove(substitution.period)
         except ValueError:
             pass
+
         schedule.append(substitution.substitution)
 
     return sorted(
@@ -84,10 +85,7 @@ def parse_schedule(
         for period_columns in zip(
                 *[
                     [
-                        tuple(batched) for batched in itertools.batched(
-                        column,
-                        constants.SCHEDULE_PERIOD_HEIGHT,
-                    )
+                        tuple(batched) for batched in itertools.batched(column, constants.SCHEDULE_PERIOD_HEIGHT)
                     ] for column in columns
                 ]
         ):
@@ -126,10 +124,7 @@ def parse_schedule(
                     tuple(
                         more_itertools.split_when(
                             column,
-                            lambda
-                                    cell,
-                                    _
-                            : cell.border.bottom.style == constants.SCHEDULE_WEEKDAY_BORDER,
+                            lambda cell, _: cell.border.bottom.style == constants.SCHEDULE_WEEKDAY_BORDER,
                         )
                     ) for column in columns
                 ]
