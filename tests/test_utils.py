@@ -105,7 +105,7 @@ class TestUtils:
                     schedule_parser.models.Substitution,
                 ), f"({string_date}) objects in parsed substitutions list"
 
-    def test_schedule_with_substitutions(self):
+    def test_apply_substitutions_to_schedule(self):
         workbook_schedule = openpyxl.load_workbook(
             filename=pyquoks.utils.get_path("resources/tables/schedule.xlsx"),
         )
@@ -118,18 +118,24 @@ class TestUtils:
             current_date = datetime.datetime.strptime(string_date, "%d_%m_%y")
 
             current_schedule = schedule_parser.utils.apply_substitutions_to_schedule(
-                schedule=list(
-                    schedule_parser.utils.parse_schedule(
-                        worksheet=workbook_schedule.worksheets[0],
-                    )
+                schedule=schedule_parser.models.GroupSchedule.get_group_schedule_by_group_name(
+                    iterable=list(
+                        schedule_parser.utils.parse_schedule(
+                            worksheet=workbook_schedule.worksheets[0],
+                        )
+                    ),
+                    group_name=self._GROUP_NAME,
+                ).get_day_schedule_by_weekday(
+                    weekday=current_date.weekday(),
+                ).periods_list,
+                substitutions=schedule_parser.models.Substitution.get_substitutions_by_group_name(
+                    iterable=list(
+                        schedule_parser.utils.parse_substitutions(
+                            worksheet=workbook_substitutions.worksheets[0],
+                        )
+                    ),
+                    group_name=self._GROUP_NAME,
                 ),
-                substitutions=list(
-                    schedule_parser.utils.parse_substitutions(
-                        worksheet=workbook_substitutions.worksheets[0],
-                    )
-                ),
-                group_name=self._GROUP_NAME,
-                date=current_date,
             )
 
             assert "".join(
